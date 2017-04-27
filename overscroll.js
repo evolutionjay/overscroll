@@ -2,32 +2,33 @@
 
 (function(){
   // Declare variables
-  var touch_x, touch_y, obj_x, obj_y, speed_x=0, speed_y=0, scrollanim;
+  let touch_x, touch_y, obj_x, obj_y, speed_x=0, speed_y=0, scrollanim;
 
 
-  var lastTime = 0;
-  var vendors = ['ms', 'moz', 'webkit', 'o'];
-  for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+  let lastTime = 0;
+  let vendors = ['ms', 'moz', 'webkit', 'o'];
+  for(let x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
       window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
       window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
                                  || window[vendors[x]+'CancelRequestAnimationFrame'];
   }
 
-  if (!window.requestAnimationFrame)
-      window.requestAnimationFrame = function(callback, element) {
-          var currTime = new Date().getTime();
-          var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-          var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
-            timeToCall);
-          lastTime = currTime + timeToCall;
-          return id;
-      };
+  if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = function(callback, element) {
+      let currTime = new Date().getTime();
+      let timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      let id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+        timeToCall);
+      lastTime = currTime + timeToCall;
+      return id;
+    };
+	}
 
-  if (!window.cancelAnimationFrame)
-      window.cancelAnimationFrame = function(id) {
-          clearTimeout(id);
-      };
-
+  if (!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame = function(id) {
+      clearTimeout(id);
+    };
+	}		
 
         
   document.addEventListener('touchstart', function(e) {
@@ -47,7 +48,7 @@
     if (obj_y.parentNode == null) obj_y = null;
     
     // Get the touch starting point
-    var touch = e.touches[0];
+    let touch = e.touches[0];
     touch_x = touch.pageX;
     touch_y = touch.pageY;
   }, false);
@@ -60,7 +61,7 @@
     e.preventDefault();
     
     // Scroll according to movement
-    var touch = e.touches[0];
+    let touch = e.touches[0];
     obj_x.scrollLeft = obj_x.scrollLeft - (touch.pageX - touch_x)
     obj_y.scrollTop = obj_y.scrollTop - (touch.pageY - touch_y)
     
@@ -87,7 +88,6 @@
       speed_x = speed_x * 0.9;
       speed_y = speed_y * 0.9;
 
-      console.log('animate')
       // Stop animation at the end
       if (speed_x < 1 && speed_x > -1 && speed_y < 1 && speed_y > -1) {
         cancelAnimationFrame(scrollanim)
