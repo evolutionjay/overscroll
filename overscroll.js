@@ -1,10 +1,38 @@
 // JavaScript Document
+
+(function() {
+		var lastTime = 0;
+		var vendors = ['ms', 'moz', 'webkit', 'o'];
+		for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+				window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+				window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+																	 || window[vendors[x]+'CancelRequestAnimationFrame'];
+		}
+ 
+		if (!window.requestAnimationFrame)
+				window.requestAnimationFrame = function(callback, element) {
+						var currTime = new Date().getTime();
+						var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+						var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+							timeToCall);
+						lastTime = currTime + timeToCall;
+						return id;
+				};
+ 
+		if (!window.cancelAnimationFrame)
+				window.cancelAnimationFrame = function(id) {
+						clearTimeout(id);
+				};
+}());
+
+
+
 (function(){
-  // Declare variables
+	// Declare variables
 	var touch_x, touch_y, obj_x, obj_y, speed_x=0, speed_y=0, scrollanim;
 	
 	document.addEventListener('touchstart', function(e) {
-		clearInterval(scrollanim);
+		cancelAnimationFrame(scrollanim);
 		// Get Touch target
 		obj_x = e.target
 		obj_y = e.target
@@ -27,7 +55,7 @@
 	
 	document.addEventListener('touchmove', function(e) {
 		// Clear animation
-		clearInterval(scrollanim);
+		cancelAnimationFrame(scrollanim);
 		
 		// Prevent window scrolling
 		e.preventDefault();
@@ -49,10 +77,11 @@
 	// Add a final animation as in iOS
 	document.addEventListener('touchend', function(e) {
 		// Clear previous animations
-		clearInterval(scrollanim);
+		cancelAnimationFrame(scrollanim);
 		
 		// Animate
-		scrollanim = setInterval(function() {
+		
+		scrollanim = function() {
 			obj_x.scrollLeft = obj_x.scrollLeft - speed_x
 			obj_y.scrollTop = obj_y.scrollTop - speed_y
 			// Decelerate
@@ -60,8 +89,12 @@
 			speed_y = speed_y * 0.9;
 			
 			// Stop animation at the end
-			if (speed_x < 1 && speed_x > -1 && speed_y < 1 && speed_y > -1) clearInterval(scrollanim)
-		},15)
-		
+			if (speed_x < 1 && speed_x > -1 && speed_y < 1 && speed_y > -1) {
+				cancelAnimationFrame(scrollanim)
+			} 
+		}
+		requestAnimationFrame = function () {
+			scrollanim
+		}
 	}, false);
 })();
